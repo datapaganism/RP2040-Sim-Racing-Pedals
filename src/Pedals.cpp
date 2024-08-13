@@ -58,17 +58,17 @@ void Pedals::update()
 
         if (joystick_ptr != NULL)
         {
-            if (pedals[i].adsChannel == Pedal_to_ADS::ACC)
+            if (pedals[i].adsChannel == ePedal::ACCELERATOR)
             {
                 joystick_ptr->Z(pedals[i].currentOutput);
             }
 
-            if (pedals[i].adsChannel == Pedal_to_ADS::BRAKE)
+            if (pedals[i].adsChannel == ePedal::BRAKE)
             {  
             joystick_ptr->Zrotate(pedals[i].currentOutput);
             }
             
-            if (pedals[i].adsChannel == Pedal_to_ADS::CLUTCH)
+            if (pedals[i].adsChannel == ePedal::CLUTCH)
             {
                 joystick_ptr->slider(pedals[i].currentOutput);
             }
@@ -88,17 +88,17 @@ uint32_t Pedals::get_led_colour()
 
         uint8_t scaled = map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, 0, 255 );
 
-        if (pedals[i].adsChannel == Pedal_to_ADS::ACC)
+        if (pedals[i].adsChannel == ePedal::ACCELERATOR)
         {
             g = scaled;
         }
 
-        if (pedals[i].adsChannel == Pedal_to_ADS::BRAKE)
+        if (pedals[i].adsChannel == ePedal::BRAKE)
         {
             r = scaled;
         }
 
-        if (pedals[i].adsChannel == Pedal_to_ADS::CLUTCH)
+        if (pedals[i].adsChannel == ePedal::CLUTCH)
         {
             b = scaled;
         }
@@ -114,22 +114,22 @@ void Pedals::debug_print()
         int percentage = constrain(map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, 0, 100), 0, 100);
         
         const char* as_string;
-        if (pedals[i].adsChannel == Pedal_to_ADS::ACC)
+        if (pedals[i].adsChannel == ePedal::ACCELERATOR)
         {
-            as_string = "Throttle ";
+            as_string = "Accelerator ";
         }
 
-        if (pedals[i].adsChannel == Pedal_to_ADS::BRAKE)
+        if (pedals[i].adsChannel == ePedal::BRAKE)
         {  
-            as_string = "Brake    ";
+            as_string = "Brake       ";
         }
         
-        if (pedals[i].adsChannel == Pedal_to_ADS::CLUTCH)
+        if (pedals[i].adsChannel == ePedal::CLUTCH)
         {
-            as_string = "Clutch   ";
+            as_string = "Clutch      ";
         }
 
-        Serial.printf("%s- %03i %%, Raw: %05i, Min: %05i, Max:%05i, Range:%05i \n", as_string, percentage, pedals[i].currentRawInput, pedals[i].minRawInputRead, pedals[i].maxRawInputRead, (pedals[i].maxRawInputRead - pedals[i].minRawInputRead));
+        Serial.printf("%s- %3i%% Raw: %5i, Min: %5i, Max:%5i, Range:%5i \n", as_string, percentage, pedals[i].currentRawInput, pedals[i].minRawInputRead, pedals[i].maxRawInputRead, (pedals[i].maxRawInputRead - pedals[i].minRawInputRead));
         
     }
     

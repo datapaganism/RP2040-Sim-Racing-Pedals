@@ -29,9 +29,10 @@ public:
 
 };
 
-enum Pedal_to_ADS
+// Maps ADC Channels to Pedals
+enum ePedal
 {
-  ACC = 0,
+  ACCELERATOR = 0,
   BRAKE = 1,
   CLUTCH = 2
 };

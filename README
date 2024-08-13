@@ -1,0 +1,36 @@
+# Sim Pedals
+
+A Sim Pedals Controller using 
+- YD RP2040 (Pi Pico)
+- ADS1115
+
+The ADS1115 is used for two potentiometers and a single loadcell
+
+Build with platformio
+
+When DEBUG is set
+The serial monitor shows the Pedal outputs, eg:
+```
+Accelerator -   0 %, Raw:  6264, Min:  6249, Max: 8696, Range: 2447 
+Brake       -   0 %, Raw:  2653, Min:  2615, Max: 2698, Range:   83 
+Clutch      -   0 %, Raw:  4578, Min:  4562, Max: 4580, Range:   18 
+```
+Press the Pedals in full once and Min and Max are the values set in `main.cpp`
+
+```cpp
+// Define Pedal values in this array, comment out a Pedal if not needed.
+// Deadzone does nothing currently
+Pedal pedal_array[] = { 
+  Pedal(ePedal::ACCELERATOR,  6249, 8696 , 0.0, 0.0 ),
+  Pedal(ePedal::BRAKE, 2653, 2615, 0.0, 0.0 ),
+  Pedal(ePedal::CLUTCH, 4578, 4562, 0.05, 0.05 )
+};
+```
+
+when LED is set
+
+The YD RP2040's Neopixel is used to show inputs of the Pedals, helpful to debug when something is wrong.
+
+- Green for Accelerator
+- Red for Brake
+- Blue for Clutch

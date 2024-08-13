@@ -10,9 +10,9 @@
 // Define Pedal values in this array, comment out a Pedal if not needed.
 // Deadzone does nothing currently
 Pedal pedal_array[] = { 
-  Pedal(Pedal_to_ADS::ACC,  6315, 8549 , 0.0, 0.0 ),
-  Pedal(Pedal_to_ADS::BRAKE, 2700, 11500, 0.0, 0.0 ),
-  Pedal(Pedal_to_ADS::CLUTCH, 4700, 6200, 0.05, 0.05 )
+  Pedal(ePedal::ACCELERATOR,  6315, 8549 , 0.0, 0.0 ),
+  Pedal(ePedal::BRAKE, 2700, 11500, 0.0, 0.0 ),
+  Pedal(ePedal::CLUTCH, 4700, 6200, 0.05, 0.05 )
 };
 
 int number_of_pedals = sizeof(pedal_array) / sizeof(pedal_array[0]);
