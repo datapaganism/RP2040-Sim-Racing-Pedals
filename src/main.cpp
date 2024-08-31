@@ -8,11 +8,10 @@
 #include "Pedal.hpp"
 
 // Define Pedal values in this array, comment out a Pedal if not needed.
-// Deadzone does nothing currently
 Pedal pedal_array[] = { 
-  Pedal(ePedal::ACCELERATOR,  6315, 8549 , 0.0, 0.0 ),
-  Pedal(ePedal::BRAKE, 2700, 11500, 0.0, 0.0 ),
-  Pedal(ePedal::CLUTCH, 4700, 6200, 0.05, 0.05 )
+  Pedal(ePedal::ACCELERATOR,  6287, 8661 , 0.05, 0.0 ),
+  Pedal(ePedal::BRAKE, 3148, 6731, 0.05, 0.0 ),
+  Pedal(ePedal::CLUTCH, 4546, 6471, 0.05, 0.05 )
 };
 
 int number_of_pedals = sizeof(pedal_array) / sizeof(pedal_array[0]);
@@ -53,9 +52,18 @@ void setup()
   ADS.setDataRate(7);
 
   if (!ADS.isConnected()) {
-    pixels.setPixelColor(0, pixels.Color(255,0,0));
-    pixels.show();
-    Serial.printf("ADC NOT CONNECTED\n");
+    while(1)
+    {
+      Serial.printf("ADC NOT CONNECTED\n");
+      pixels.setBrightness(120);
+      pixels.setPixelColor(0, pixels.Color(255,0,0));
+      pixels.show();
+      delay(300);
+      pixels.setPixelColor(0, pixels.Color(128,0,0));
+      pixels.show();
+      delay(300);
+    }
+    
   }  
 
   int ret = pedals.begin(&Joystick, &ADS); 
@@ -63,9 +71,14 @@ void setup()
   {
     while(1)
     {
-      pixels.setPixelColor(0, pixels.Color(255,0,0));
-      pixels.show();
       Serial.printf("problem with init %i\n", ret);
+      pixels.setBrightness(120);
+      pixels.setPixelColor(0, pixels.Color(0,255,0));
+      pixels.show();
+      delay(300);
+      pixels.setPixelColor(0, pixels.Color(0,128,0));
+      pixels.show();
+      delay(300);
     }
   }
 

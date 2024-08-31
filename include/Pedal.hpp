@@ -17,7 +17,8 @@ public:
     uint16_t maxOutput = (1 << 10) - 1;   
     uint16_t startDeadzone = 0;   
     uint16_t endDeadzone = 0;   
-    uint16_t currentRawInput = 0;   
+    uint16_t currentRawInput = 0;
+    uint16_t rawRange = 0;   
     Smoothed<int16_t> smoothedInput;
 
     uint16_t currentOutput = 0;
@@ -25,7 +26,7 @@ public:
     uint16_t adsChannel = 0;
 
 
-    Pedal(uint16_t adsChannel, uint16_t minRawInput, uint16_t maxRawInput, uint16_t startDeadzone, uint16_t endDeadzone);
+    Pedal(uint16_t adsChannel, uint16_t minRawInput, uint16_t maxRawInput, float startDeadzone, float endDeadzone);
 
 };
 

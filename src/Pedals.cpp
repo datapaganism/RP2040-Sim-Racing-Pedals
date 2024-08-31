@@ -53,8 +53,8 @@ void Pedals::update()
 
         pedals[i].smoothedInput.add(pedals[i].currentRawInput);
 
-
-        pedals[i].currentOutput = constrain(map(pedals[i].smoothedInput.get(), pedals[i].minRawInput, pedals[i].maxRawInput, pedals[i].minOutput, pedals[i].maxOutput), pedals[i].minOutput, pedals[i].maxOutput );
+        uint16_t smoothed = pedals[i].smoothedInput.get();
+        pedals[i].currentOutput = constrain(map(smoothed, pedals[i].minRawInput + pedals[i].startDeadzone, pedals[i].maxRawInput - pedals[i].endDeadzone, pedals[i].minOutput, pedals[i].maxOutput), pedals[i].minOutput, pedals[i].maxOutput );
 
         if (joystick_ptr != NULL)
         {
@@ -86,7 +86,7 @@ uint32_t Pedals::get_led_colour()
     for (int i = 0; i < number_of_pedals; i++)
     {
 
-        uint8_t scaled = map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, 0, 255 );
+        uint8_t scaled = constrain(map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, 0, 255 ), 0, 255);
 
         if (pedals[i].adsChannel == ePedal::ACCELERATOR)
         {
