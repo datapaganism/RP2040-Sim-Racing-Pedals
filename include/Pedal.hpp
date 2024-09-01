@@ -18,6 +18,7 @@ public:
     uint16_t startDeadzone = 0;   
     uint16_t endDeadzone = 0;   
     uint16_t currentRawInput = 0;
+    uint16_t lastRawInput = 0;
     uint16_t rawRange = 0;   
     Smoothed<int16_t> smoothedInput;
 

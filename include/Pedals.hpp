@@ -12,6 +12,7 @@ class Pedals
 public:
     int number_of_pedals;
     Pedal* pedals;
+    bool updated = false;
 
     Joystick_* joystick_ptr;
     ADS1115* ads_ptr;

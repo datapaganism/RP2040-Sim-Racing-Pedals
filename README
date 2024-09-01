@@ -19,7 +19,6 @@ Press the Pedals in full once and Min and Max are the values set in `main.cpp`
 
 ```cpp
 // Define Pedal values in this array, comment out a Pedal if not needed.
-// Deadzone does nothing currently
 Pedal pedal_array[] = { 
   Pedal(ePedal::ACCELERATOR,  6249, 8696 , 0.0, 0.0 ),
   Pedal(ePedal::BRAKE, 2653, 2615, 0.0, 0.0 ),

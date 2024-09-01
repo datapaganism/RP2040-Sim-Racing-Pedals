@@ -36,6 +36,12 @@ void Pedals::update()
     for (int i = 0; i < number_of_pedals; i++)
     {
         pedals[i].currentRawInput = ads_ptr->readADC(pedals[i].adsChannel);
+        if (pedals[i].currentRawInput == pedals[i].lastRawInput)
+        {
+            continue;
+        }
+        pedals[i].lastRawInput = pedals[i].currentRawInput;
+        this->updated = true;
 
 
         #if defined(DEBUG)
@@ -129,7 +135,7 @@ void Pedals::debug_print()
             as_string = "Clutch      ";
         }
 
-        Serial.printf("%s- %3i%% Raw: %5i, Min: %5i, Max:%5i, Range:%5i \n", as_string, percentage, pedals[i].currentRawInput, pedals[i].minRawInputRead, pedals[i].maxRawInputRead, (pedals[i].maxRawInputRead - pedals[i].minRawInputRead));
+        Serial.printf("%s- %3i%% Raw: %5i, Min: %5i, Max:%5i, Min-Dead: %5i, Max-Dead:%5i,  Range:%5i \n", as_string, percentage, pedals[i].currentRawInput, pedals[i].minRawInputRead, pedals[i].maxRawInputRead,  pedals[i].minRawInputRead + pedals[i].startDeadzone,  pedals[i].maxRawInputRead - pedals[i].endDeadzone, (pedals[i].maxRawInputRead - pedals[i].minRawInputRead));
         
     }
     
