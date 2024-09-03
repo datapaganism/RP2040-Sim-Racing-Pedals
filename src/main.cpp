@@ -10,7 +10,7 @@
 // Define Pedal values in this array, comment out a Pedal if not needed.
 Pedal pedal_array[] = { 
   Pedal(ePedal::ACCELERATOR,  6287, 8661 , 0.05, 0.0 ),
-  Pedal(ePedal::BRAKE, 3148, 6731, 0.07, 0.0 ),
+  Pedal(ePedal::BRAKE, 3148, 6731, 0.10, 0.0 ),
   Pedal(ePedal::CLUTCH, 4546, 6471, 0.05, 0.05 )
 };
 
