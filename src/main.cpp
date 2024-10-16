@@ -9,8 +9,8 @@
 
 // Define Pedal values in this array, comment out a Pedal if not needed.
 Pedal pedal_array[] = { 
-  Pedal(ePedal::ACCELERATOR,  6287, 8661 , 0.05, 0.0 ),
-  Pedal(ePedal::BRAKE, 3148, 6731, 0.10, 0.0 ),
+  Pedal(ePedal::ACCELERATOR,  6287, 8661 , 0.05, 0.03 ),
+  Pedal(ePedal::BRAKE, 3100, 6731, 0.07, 0.01 ),
   Pedal(ePedal::CLUTCH, 4546, 6471, 0.05, 0.05 )
 };
 
@@ -24,6 +24,14 @@ Pedals pedals(number_of_pedals, pedal_array);
 bool sendDebug = true;
 #define DebugRefreshRate 200
 unsigned long currentMillis = 0, lastDebug = 0;
+
+static void clear_serial_monitor()
+{
+  Serial.write(27);     // ESC
+  Serial.print("[2J");  // Clear entire screen
+  Serial.write(27);     // ESC
+  Serial.print("[H");   // Move cursor to home position
+}
 
 void setup()
 {
@@ -97,6 +105,7 @@ pedals.update();
   if (currentMillis - lastDebug > DebugRefreshRate )
   {
     sendDebug = true;
+    clear_serial_monitor();
     pedals.debug_print();
     lastDebug = currentMillis;
   }
