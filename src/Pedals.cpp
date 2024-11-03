@@ -60,7 +60,10 @@ void Pedals::update()
         pedals[i].smoothedInput.add(pedals[i].currentRawInput);
 
         uint16_t smoothed = pedals[i].smoothedInput.get();
-        pedals[i].currentOutput = constrain(map(smoothed, pedals[i].minRawInput + pedals[i].startDeadzone, pedals[i].maxRawInput - pedals[i].endDeadzone, pedals[i].minOutput, pedals[i].maxOutput), pedals[i].minOutput, pedals[i].maxOutput );
+
+        uint32_t mapMin = (this->inverted) ? pedals[i].maxOutput : pedals[i].minOutput;
+        uint32_t mapMax = (this->inverted) ? pedals[i].minOutput : pedals[i].maxOutput;
+        pedals[i].currentOutput = constrain(map(smoothed, pedals[i].minRawInput + pedals[i].startDeadzone, pedals[i].maxRawInput - pedals[i].endDeadzone, mapMin, mapMax), pedals[i].minOutput, pedals[i].maxOutput );
 
         if (joystick_ptr != NULL)
         {
@@ -92,7 +95,10 @@ uint32_t Pedals::get_led_colour()
     for (int i = 0; i < number_of_pedals; i++)
     {
 
-        uint8_t scaled = constrain(map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, 0, 255 ), 0, 255);
+        uint8_t mapMin = (this->inverted) ? 255 : 0;
+        uint8_t mapMax = (this->inverted) ? 0 : 255;
+
+        uint8_t scaled = constrain(map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, mapMin, mapMax ), 0, 255);
 
         if (pedals[i].adsChannel == ePedal::ACCELERATOR)
         {
@@ -140,4 +146,9 @@ void Pedals::debug_print()
     }
     
     Serial.printf("\n");
+}
+
+void Pedals::invert()
+{
+    this->inverted = !this->inverted;
 }

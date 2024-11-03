@@ -13,6 +13,7 @@ public:
     int number_of_pedals;
     Pedal* pedals;
     bool updated = false;
+    bool inverted = false;
 
     Joystick_* joystick_ptr;
     ADS1115* ads_ptr;
@@ -22,6 +23,7 @@ public:
     int begin(Joystick_* joystickPtr, ADS1115* adsPtr);
     void update();
     void debug_print();
+    void invert();
 
     uint32_t get_led_colour();
 };
