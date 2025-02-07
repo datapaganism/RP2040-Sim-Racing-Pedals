@@ -16,9 +16,9 @@ static uint8_t toggle_invert=0;
 
 // Define Pedal values in this array, comment out a Pedal if not needed.
 Pedal pedal_array[] = {
-    Pedal(ePedal::ACCELERATOR, 6287, 8661, 0.05, 0.03),
-    Pedal(ePedal::BRAKE, 3100, 6731, 0.07, 0.01),
-    Pedal(ePedal::CLUTCH, 4546, 6471, 0.05, 0.05)
+    Pedal(ePedal::ACCELERATOR, 23900, 24946, 0.05, 0.03),
+    Pedal(ePedal::BRAKE, 3100, 9264, 0.03, 0.01),
+    Pedal(ePedal::CLUTCH, 9125, 11210, 0.05, 0.05)
 };
 constexpr int number_of_pedals = sizeof(pedal_array) / sizeof(pedal_array[0]);
 
