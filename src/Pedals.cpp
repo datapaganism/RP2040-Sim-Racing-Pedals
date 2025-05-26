@@ -44,7 +44,7 @@ void Pedals::update()
         this->updated = true;
 
 
-        #if defined(DEBUG)
+        #ifdef DEBUG
             if (pedals[i].currentRawInput > pedals[i].maxRawInputRead)
             {
                 pedals[i].maxRawInputRead = pedals[i].currentRawInput;
@@ -83,7 +83,7 @@ void Pedals::update()
         }
     }
 }
-
+#ifdef LED
 uint32_t Pedals::get_led_colour()
 {
 
@@ -116,7 +116,9 @@ uint32_t Pedals::get_led_colour()
     }
     return Adafruit_NeoPixel::Color(r,g,b);
 }
+#endif
 
+#ifdef DEBUG
 void Pedals::debug_print()
 {
     for (int i = 0; i < number_of_pedals; i++)
@@ -146,6 +148,7 @@ void Pedals::debug_print()
     
     Serial.printf("\n");
 }
+#endif
 
 void Pedals::invert()
 {

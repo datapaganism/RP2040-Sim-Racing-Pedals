@@ -3,7 +3,10 @@
 #include <Joystick.h>
 #include <cstdint>
 #include <ADS1X15.h>
+
+#ifdef LED
 #include <Adafruit_NeoPixel.h>
+#endif
 
 #include "Pedal.hpp"
 
@@ -22,8 +25,13 @@ public:
 
     int begin(Joystick_* joystickPtr, ADS1115* adsPtr);
     void update();
-    void debug_print();
     void invert();
 
+#ifdef DEBUG
+    void debug_print();
+#endif
+
+    #ifdef LED
     uint32_t get_led_colour();
+    #endif
 };
