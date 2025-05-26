@@ -28,8 +28,14 @@ ADS1115 ADS(0x48);
 Pedals pedals(number_of_pedals, pedal_array);
 
 bool sendDebug = true;
-#define DebugRefreshRate 200
-unsigned long currentMillis = 0, lastDebug = 0;
+const float debug_refresh_rate_hz = DEBUG_HZ;
+const int debug_refresh_rate_ms = ((1/debug_refresh_rate_hz) * 1000);
+
+const float report_refresh_rate_hz = REPORT_HZ;
+const int report_refresh_rate_ms = ((1/report_refresh_rate_hz) * 1000);
+
+
+unsigned long current_millis = 0, last_debug = 0, last_report = 0;
 
 static void clear_serial_monitor()
 {
@@ -100,6 +106,8 @@ void setup()
 void loop()
 {
 
+  current_millis = millis();
+
   if (!digitalRead(INVERT_BUTTON))
   {
     delay(100);
@@ -114,18 +122,16 @@ void loop()
   pedals.update();
 
 #if defined(DEBUG)
-  currentMillis = millis();
-  if (currentMillis - lastDebug > DebugRefreshRate)
+  if (current_millis - last_debug > debug_refresh_rate_ms)
   {
     sendDebug = true;
     clear_serial_monitor();
     pedals.debug_print();
-    lastDebug = currentMillis;
+    last_debug = current_millis;
   }
 #endif
 
 #if defined(LED)
-  // pixels.clear();
   pixels.setPixelColor(0, pedals.get_led_colour());
   pixels.show();
 
@@ -133,11 +139,16 @@ void loop()
 
 #endif
 
-  if (pedals.updated)
+  if (current_millis - last_report > report_refresh_rate_ms)
   {
-    Joystick.send_now();
-    pedals.updated = false;
+    last_report = current_millis;
+    if (pedals.updated)
+    {
+      Joystick.send_now();
+      pedals.updated = false;
+    }
   }
+
 
 #if defined(DEBUG)
   sendDebug = false;
