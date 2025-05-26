@@ -9,25 +9,25 @@
 class Pedal
 {
 public:
-    uint16_t minRawInput = 0;   
-    uint16_t maxRawInput = 0;   
-    uint16_t minRawInputRead = (1 << 16) - 1;   
-    uint16_t maxRawInputRead = 0;   
-    uint16_t minOutput = 0;   
-    uint16_t maxOutput = (1 << 10) - 1;   
-    uint16_t startDeadzone = 0;   
-    uint16_t endDeadzone = 0;   
-    uint16_t currentRawInput = 0;
-    uint16_t lastRawInput = 0;
-    uint16_t rawRange = 0;   
+    int16_t minRawInput = 0;   
+    int16_t maxRawInput = 0;   
+    int16_t minRawInputRead = (1 << 15) - 1;   
+    int16_t maxRawInputRead = 0;   
+    int16_t minOutput = -(1 << 15);   
+    int16_t maxOutput = (1 << 15) - 1;   
+    int16_t startDeadzone = 0;   
+    int16_t endDeadzone = 0;   
+    int16_t currentRawInput = 0;
+    int16_t lastRawInput = 0;
+    int16_t rawRange = 0;   
     Smoothed<int16_t> smoothedInput;
 
-    uint16_t currentOutput = 0;
+    int16_t currentOutput = 0;
     
     uint16_t adsChannel = 0;
 
 
-    Pedal(uint16_t adsChannel, uint16_t minRawInput, uint16_t maxRawInput, float startDeadzone, float endDeadzone);
+    Pedal(uint16_t adsChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone);
 
 };
 

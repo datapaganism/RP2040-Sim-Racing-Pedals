@@ -59,12 +59,11 @@ void Pedals::update()
 
         pedals[i].smoothedInput.add(pedals[i].currentRawInput);
 
-        uint16_t smoothed = pedals[i].smoothedInput.get();
+        int16_t smoothed = pedals[i].smoothedInput.get();
 
-        uint32_t mapMin = (this->inverted) ? pedals[i].maxOutput : pedals[i].minOutput;
-        uint32_t mapMax = (this->inverted) ? pedals[i].minOutput : pedals[i].maxOutput;
+        int16_t mapMin = (this->inverted) ? pedals[i].maxOutput : pedals[i].minOutput;
+        int16_t mapMax = (this->inverted) ? pedals[i].minOutput : pedals[i].maxOutput;
         pedals[i].currentOutput = constrain(map(smoothed, pedals[i].minRawInput + pedals[i].startDeadzone, pedals[i].maxRawInput - pedals[i].endDeadzone, mapMin, mapMax), pedals[i].minOutput, pedals[i].maxOutput );
-
         if (joystick_ptr != NULL)
         {
             if (pedals[i].adsChannel == ePedal::ACCELERATOR)

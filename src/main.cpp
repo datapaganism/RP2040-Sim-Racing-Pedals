@@ -16,7 +16,7 @@ static uint8_t toggle_invert=0;
 
 // Define Pedal values in this array, comment out a Pedal if not needed.
 Pedal pedal_array[] = {
-    Pedal(ePedal::ACCELERATOR, 23900, 24946, 0.05, 0.03),
+    Pedal(ePedal::ACCELERATOR, 23900, 25470, 0.05, 0.03),
     Pedal(ePedal::BRAKE, 3100, 9264, 0.03, 0.01),
     Pedal(ePedal::CLUTCH, 9125, 11210, 0.05, 0.05)
 };
@@ -54,7 +54,7 @@ void setup()
   Wire.setClock(400000);
 
   Joystick.begin();
-  Joystick.use8bit(false);
+  Joystick.use16bit();
   Joystick.useManualSend(true);
 
   ADS.begin();

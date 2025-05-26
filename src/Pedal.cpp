@@ -1,6 +1,6 @@
 #include "Pedal.hpp"
 
-Pedal::Pedal(uint16_t adsChannel, uint16_t minRawInput, uint16_t maxRawInput, float startDeadzone, float endDeadzone)
+Pedal::Pedal(uint16_t adsChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone)
 {
     this->adsChannel = adsChannel;
     this->minRawInput = minRawInput;
