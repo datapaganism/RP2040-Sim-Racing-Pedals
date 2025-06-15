@@ -12,9 +12,9 @@
 
 // Define Pedal values in this array, comment out a Pedal if not needed.
 Pedal pedal_array[] = {
-    Pedal(ePedal::ACCELERATOR, 23900, 25470, 0.05, 0.03),
+    Pedal(ePedal::ACCELERATOR, 23646, 25529, 0.05, 0.03),
     Pedal(ePedal::BRAKE, 3100, 9264, 0.03, 0.01),
-    Pedal(ePedal::CLUTCH, 9125, 11210, 0.05, 0.05)};
+    Pedal(ePedal::CLUTCH, 8900, 11053, 0.05, 0.05)};
 constexpr int number_of_pedals = sizeof(pedal_array) / sizeof(pedal_array[0]);
 
 
@@ -56,6 +56,12 @@ static void clear_serial_monitor()
     Serial.print("[H");  // Move cursor to home position
 }
 
+void handle_invert_interrupt()
+{
+    toggle_invert = !toggle_invert;
+    pedals.invert();
+}
+
 void setup()
 {
 #ifdef DEBUG
@@ -75,6 +81,8 @@ void setup()
     Joystick.begin();
     Joystick.use16bit();
     Joystick.useManualSend(true);
+
+    attachInterrupt(digitalPinToInterrupt(INVERT_BUTTON), handle_invert_interrupt, FALLING);
 
     ADS.begin();
     ADS.setGain(1);
@@ -120,20 +128,10 @@ void setup()
     }
 }
 
+
 void loop()
 {
     current_millis = millis();
-
-    if (!digitalRead(INVERT_BUTTON))
-    {
-        delay(100);
-        if (!digitalRead(INVERT_BUTTON))
-        {
-            toggle_invert = !toggle_invert;
-            pedals.invert();
-        }
-        // while (!digitalRead(INVERT_BUTTON))
-    }
 
 #ifdef DEBUG
     if (current_millis - last_debug > debug_refresh_rate_ms)
