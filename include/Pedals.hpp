@@ -9,21 +9,21 @@
 #endif
 
 #include "Pedal.hpp"
+#include "AnalogPedal.hpp"
 
 class Pedals
 {
 public:
-    int number_of_pedals;
-    Pedal* pedals;
+    std::vector<AnalogPedal>& pedals;
     bool updated = false;
     bool inverted = false;
 
     Joystick_* joystick_ptr;
     ADS1115* ads_ptr;
 
-    Pedals(int number_of_pedals, Pedal* pedal_array);
+    Pedals(std::vector<AnalogPedal>& pedals);
 
-    int begin(Joystick_* joystickPtr, ADS1115* adsPtr);
+    int begin(Joystick_* joystickPtr);
     void update();
     void invert();
 

@@ -11,5 +11,15 @@ Pedal::Pedal(uint16_t adsChannel, int16_t minRawInput, int16_t maxRawInput, floa
     this->startDeadzone = startDeadzone * this->rawRange;
     this->endDeadzone = endDeadzone * this->rawRange;
 
-    this->smoothedInput.begin(SMOOTHED_AVERAGE, 1);
+    this->responsiveInput.begin(adsChannel,true);
+
+}
+
+void Pedal::adc_init()
+{
+}
+
+int64_t Pedal::adc_read()
+{
+    return 0;
 }
