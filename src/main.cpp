@@ -14,19 +14,16 @@
 #include "ADS1X15Pedal.hpp"
 #include "HX711Pedal.hpp"
 
-
-
-
 std::vector<std::unique_ptr<Pedal>> pedal_array;
 
 #ifdef LED
-    Adafruit_NeoPixel pixels(1, 23, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels(1, 23, NEO_GRB + NEO_KHZ800);
 #endif
 
 Pedals pedals(pedal_array);
 
 #ifdef DEBUG
-    bool sendDebug = true;
+bool sendDebug = true;
 #endif
 
 // A User button has been defined, allowing you to invert all of the pedals in one go,
@@ -73,7 +70,6 @@ void handle_invert_interrupt()
     pedals.invert();
 }
 
-
 void setup()
 {
 #ifdef DEBUG
@@ -113,17 +109,16 @@ void setup()
         }
     }
 
-    for (const auto& pedal : pedal_array)
+    for (const auto &pedal : pedal_array)
     {
         pedal->oneShotSharedClassInit();
         // if (pedal->oneShotSharedClassInitDone == false)
         // {
-            pedal->readerInit();
-            // pedal->oneShotSharedClassInitDone = true;
+        pedal->readerInit();
+        // pedal->oneShotSharedClassInitDone = true;
         // }
     }
 }
-
 
 void loop()
 {

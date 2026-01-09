@@ -22,13 +22,11 @@ Pedal::Pedal(enum pedalType type, uint16_t pinChannel, int16_t minRawInput, int1
     this->pinChannel = pinChannel;
     this->minRawInput = minRawInput;
     this->maxRawInput = maxRawInput;
-    
+
     this->rawRange = maxRawInput - minRawInput;
 
     this->startDeadzone = startDeadzone * this->rawRange;
     this->endDeadzone = endDeadzone * this->rawRange;
 
-    this->responsiveInput.begin(pinChannel,true);
-
+    this->responsiveInput.begin(pinChannel, true);
 }
-

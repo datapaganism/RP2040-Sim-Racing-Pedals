@@ -1,15 +1,13 @@
 #include "AnalogPedal.hpp"
 
-
-
 void AnalogPedal::readerInit()
 {
-    pinMode(pinChannel,INPUT);
+    pinMode(pinChannel, INPUT);
 }
 
 int64_t AnalogPedal::read()
 {
-    
+
     return analogRead(pinChannel);
 }
 

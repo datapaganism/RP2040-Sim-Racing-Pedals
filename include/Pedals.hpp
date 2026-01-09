@@ -15,16 +15,16 @@
 class Pedals
 {
 public:
-    std::vector<std::unique_ptr<Pedal>>& pedals;
+    std::vector<std::unique_ptr<Pedal>> &pedals;
     bool updated = true;
     bool inverted = false;
 
-    Joystick_* joystick_ptr;
-    ADS1115* ads_ptr;
+    Joystick_ *joystick_ptr;
+    ADS1115 *ads_ptr;
 
-    Pedals(std::vector<std::unique_ptr<Pedal>>& pedals);
+    Pedals(std::vector<std::unique_ptr<Pedal>> &pedals);
 
-    int begin(Joystick_* joystickPtr);
+    int begin(Joystick_ *joystickPtr);
     void update();
     void invert();
 
@@ -32,7 +32,7 @@ public:
     void debug_print();
 #endif
 
-    #ifdef LED
+#ifdef LED
     uint32_t get_led_colour();
-    #endif
+#endif
 };
