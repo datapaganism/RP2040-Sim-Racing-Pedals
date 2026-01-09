@@ -3,7 +3,7 @@
 
 // extern Joystick_ Joystick;
 
-Pedals::Pedals(std::vector<AnalogPedal>& pedals) : pedals(pedals) {}
+Pedals::Pedals(std::vector<std::unique_ptr<Pedal>>& pedals) : pedals(pedals) {}
 
 int Pedals::begin(Joystick_* joystickPtr)
 {
@@ -29,51 +29,52 @@ int Pedals::begin(Joystick_* joystickPtr)
 
 void Pedals::update()
 {
-    for (auto& pedal : pedals)
+    for (const auto& pedal : pedals)
     {
-        pedal.currentRawInput = pedal.adc_read();
+        pedal->currentRawInput = pedal->adc_read();
 
-        // if (pedal.currentRawInput == pedal.lastRawInput)
-        // {
-        //     continue;
-        // }
-        pedal.lastRawInput = pedal.currentRawInput;
+        if (pedal->currentRawInput == pedal->lastRawInput)
+        {
+            continue;
+        }
+        pedal->lastRawInput = pedal->currentRawInput;
         this->updated = true;
 
 
         #ifdef DEBUG
-            if (pedal.currentRawInput > pedal.maxRawInputRead)
+            if (pedal->currentRawInput > pedal->maxRawInputRead)
             {
-                pedal.maxRawInputRead = pedal.currentRawInput;
+                pedal->maxRawInputRead = pedal->currentRawInput;
             }
 
-            if (pedal.currentRawInput < pedal.minRawInputRead)
+            if (pedal->currentRawInput < pedal->minRawInputRead)
             {
-                pedal.minRawInputRead = pedal.currentRawInput;
+                pedal->minRawInputRead = pedal->currentRawInput;
             }
         #endif
 
-        pedal.responsiveInput.update(pedal.currentRawInput);
+        pedal->responsiveInput.update(pedal->currentRawInput);
 
-        int16_t smoothed = pedal.responsiveInput.getValue();
+        int16_t smoothed = pedal->responsiveInput.getValue();
+        smoothed = pedal->currentRawInput;
 
-        int16_t mapMin = (this->inverted) ? pedal.maxOutput : pedal.minOutput;
-        int16_t mapMax = (this->inverted) ? pedal.minOutput : pedal.maxOutput;
-        pedal.currentOutput = constrain(map(smoothed, pedal.minRawInput + pedal.startDeadzone, pedal.maxRawInput - pedal.endDeadzone, mapMin, mapMax), pedal.minOutput, pedal.maxOutput );
+        int16_t mapMin = (this->inverted) ? pedal->maxOutput : pedal->minOutput;
+        int16_t mapMax = (this->inverted) ? pedal->minOutput : pedal->maxOutput;
+        pedal->currentOutput = constrain(map(smoothed, pedal->minRawInput + pedal->startDeadzone, pedal->maxRawInput - pedal->endDeadzone, mapMin, mapMax), pedal->minOutput, pedal->maxOutput );
         if (joystick_ptr != NULL)
         {
-            if (pedal.adsChannel == pedal.ePedal::ACCELERATOR)
+            if (pedal->type == pedalType::ACCELERATOR)
             {
-                joystick_ptr->Z(pedal.currentOutput);
+                joystick_ptr->Z(pedal->currentOutput);
             }
-            if (pedal.adsChannel == pedal.ePedal::BRAKE)
+            if (pedal->type == pedalType::BRAKE)
             {  
-                joystick_ptr->Zrotate(pedal.currentOutput);
+                joystick_ptr->Zrotate(pedal->currentOutput);
             }
             
-            if (pedal.adsChannel == pedal.ePedal::CLUTCH)
+            if (pedal->type == pedalType::CLUTCH)
             {
-                joystick_ptr->slider(pedal.currentOutput);
+                joystick_ptr->slider(pedal->currentOutput);
             }
         }
     }
@@ -81,30 +82,29 @@ void Pedals::update()
 #ifdef LED
 uint32_t Pedals::get_led_colour()
 {
-
     uint8_t r = 0;
     uint8_t g = 0;
     uint8_t b = 0;
 
-    for (auto& pedal : pedals)
+    for (const auto& pedal : pedals)
     {
 
         uint8_t mapMin = (this->inverted) ? 255 : 0;
         uint8_t mapMax = (this->inverted) ? 0 : 255;
 
-        uint8_t scaled = constrain(map(pedal.currentOutput, pedal.minOutput, pedal.maxOutput, mapMin, mapMax ), 0, 255);
+        uint8_t scaled = constrain(map(pedal->currentOutput, pedal->minOutput, pedal->maxOutput, mapMin, mapMax ), 0, 255);
 
-        if (pedal.adsChannel == pedal.ePedal::ACCELERATOR)
+        if (pedal->type == pedalType::ACCELERATOR)
         {
             g = scaled;
         }
 
-        if (pedal.adsChannel == pedal.ePedal::BRAKE)
+        if (pedal->type == pedalType::BRAKE)
         {
             r = scaled;
         }
 
-        if (pedal.adsChannel == pedal.ePedal::CLUTCH)
+        if (pedal->type == pedalType::CLUTCH)
         {
             b = scaled;
         }
@@ -116,28 +116,28 @@ uint32_t Pedals::get_led_colour()
 #ifdef DEBUG
 void Pedals::debug_print()
 {
-    for (auto& pedal : pedals)
+    for (const auto& pedal : pedals)
     {
 
-        int percentage = constrain(map(pedal.currentOutput, pedal.minOutput, pedal.maxOutput, 0, 100), 0, 100);
+        int percentage = constrain(map(pedal->currentOutput, pedal->minOutput, pedal->maxOutput, 0, 100), 0, 100);
         
         const char* as_string;
-        if (pedal.adsChannel == pedal.ePedal::ACCELERATOR)
+        if (pedal->type == pedalType::ACCELERATOR)
         {
             as_string = "Accelerator ";
         }
 
-        if (pedal.adsChannel == pedal.ePedal::BRAKE)
+        if (pedal->type == pedalType::BRAKE)
         {  
             as_string = "Brake       ";
         }
         
-        if (pedal.adsChannel == pedal.ePedal::CLUTCH)
+        if (pedal->type == pedalType::CLUTCH)
         {
             as_string = "Clutch      ";
         }
 
-        Serial.printf("%s- %3i%% Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedal.currentRawInput, pedal.minRawInputRead, pedal.maxRawInputRead,  pedal.minRawInput + pedal.startDeadzone,  pedal.maxRawInput - pedal.endDeadzone, (pedal.maxRawInputRead - pedal.minRawInputRead));
+        Serial.printf("%s- %3i%% Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedal->currentRawInput, pedal->minRawInputRead, pedal->maxRawInputRead,  pedal->minRawInput + pedal->startDeadzone,  pedal->maxRawInput - pedal->endDeadzone, (pedal->maxRawInputRead - pedal->minRawInputRead));
         
     }
     

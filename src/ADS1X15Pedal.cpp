@@ -3,7 +3,36 @@
 #include <ADS1X15.h>
 
 
-extern ADS1115 ADS;
+ADS1115 ADS(0x48);
+
+
+extern TwoWire Wire;
+extern void flash_error();
+
+void ADS1X15Pedal::class_init()
+{
+    Wire.setSDA(20);
+    Wire.setSCL(21);
+    Wire.begin();
+    Wire.setClock(400000);
+
+    ADS.begin();
+    ADS.setGain(1);
+    ADS.setMode(1);
+    ADS.setDataRate(7);
+
+//     if (!ADS.isConnected())
+//     {
+//         while (1)
+//         {
+//             Serial.printf("ADC NOT CONNECTED\n");
+// #ifdef LED
+//             flash_error();
+// #endif
+//         }
+//     }
+
+}
 
 void ADS1X15Pedal::adc_init() 
 {

@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <Joystick.h>
-#include <ADS1X15.h>
 #include <vector>
+#include <memory>
 
 #ifdef LED
 #include <Adafruit_NeoPixel.h>
@@ -11,20 +11,17 @@
 #include "Pedals.hpp"
 #include "Pedal.hpp"
 #include "AnalogPedal.hpp"
+#include "ADS1X15Pedal.hpp"
 
 
-// Define Pedal values in this array, comment out a Pedal if not needed.
-std::vector<AnalogPedal> pedal_array = {
-    AnalogPedal(AnalogPedal::ePedal::ACCELERATOR, 1023, 620, 0.00, 0.04),
-    AnalogPedal(AnalogPedal::ePedal::BRAKE, 1023, 530, 0.00, 0.04),
-    AnalogPedal(AnalogPedal::ePedal::CLUTCH, 1023, 530, 0.05, 0.05)
-};
+
+
+std::vector<std::unique_ptr<Pedal>> pedal_array;
 
 #ifdef LED
     Adafruit_NeoPixel pixels(1, 23, NEO_GRB + NEO_KHZ800);
 #endif
 
-ADS1115 ADS(0x48);
 Pedals pedals(pedal_array);
 
 #ifdef DEBUG
@@ -75,61 +72,32 @@ void handle_invert_interrupt()
     pedals.invert();
 }
 
-void ads_init()
-{
-    Wire.setSDA(20);
-    Wire.setSCL(21);
-    Wire.begin();
-    Wire.setClock(400000);
-
-    ADS.begin();
-    ADS.setGain(1);
-    ADS.setMode(1);
-    ADS.setDataRate(7);
-
-    if (!ADS.isConnected())
-    {
-        while (1)
-        {
-            Serial.printf("ADC NOT CONNECTED\n");
-#ifdef LED
-            flash_error();
-#endif
-        }
-    }
-
-}
-
-void analog_init()
-{
-    analogReadResolution(10);
-}
-
-void hx711_init()
-{
-
-}
 
 void setup()
 {
 #ifdef DEBUG
+    while (!Serial) yield();
     Serial.begin(MONITOR_SPEED);
 #endif
+
+    // Define Pedal values in this array, comment out a Pedal if not needed.
+    // pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::ACCELERATOR, 0, 10733, 12268, 0.06, 0.02));
+    // pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::BRAKE, 1, 3243, 10000, 0.04, 0.01));
+    // pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::CLUTCH, 2, 21449, 23231, 0.05, 0.05));
+    pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::ACCELERATOR, 26, 1023, 620, 0.00, 0.04));
+    pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::BRAKE, 28, 1023, 530, 0.00, 0.04));
+    pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::CLUTCH, 27, 1023, 530, 0.05, 0.05));
 
 #ifdef LED
     pixels.begin();
     pixels.setBrightness(255);
 #endif
 
-
-    analog_init();
-
     Joystick.begin();
     Joystick.use10bit();
     Joystick.useManualSend(true);
 
     attachInterrupt(digitalPinToInterrupt(INVERT_BUTTON), handle_invert_interrupt, FALLING);
-
     pinMode(INVERT_BUTTON, INPUT_PULLUP);
     pinMode(INVERT_BUTTON_LED, OUTPUT);
 
@@ -145,9 +113,14 @@ void setup()
         }
     }
 
-    for (auto pedal : pedal_array)
+    for (const auto& pedal : pedal_array)
     {
-        pedal.adc_init();
+        pedal->class_init();
+        // if (pedal->type_init == false)
+        // {
+            pedal->adc_init();
+            // pedal->type_init = true;
+        // }
     }
 }
 
@@ -171,11 +144,11 @@ void loop()
     if (current_millis - last_report > report_refresh_rate_ms)
     {
         last_report = current_millis;
-        // if (pedals.updated)
-        // {
+        if (pedals.updated)
+        {
             Joystick.send_now();
             pedals.updated = false;
-        // }
+        }
 
 #ifdef LED
         pixels.setPixelColor(0, pedals.get_led_colour());
