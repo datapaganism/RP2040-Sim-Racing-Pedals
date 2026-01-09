@@ -1,25 +1,25 @@
 #include "Pedal.hpp"
 
-void Pedal::adc_init()
+void Pedal::readerInit()
 {
     Serial.println("Do not call");
 }
 
-int64_t Pedal::adc_read()
+int64_t Pedal::read()
 {
     Serial.println("Do not call");
     return 0;
 }
 
-void Pedal::class_init()
+void Pedal::oneShotSharedClassInit()
 {
     Serial.println("Do not call");
 }
 
-Pedal::Pedal(enum pedalType type, uint16_t adsChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone)
+Pedal::Pedal(enum pedalType type, uint16_t pinChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone)
 {
     this->type = type;
-    this->adsChannel = adsChannel;
+    this->pinChannel = pinChannel;
     this->minRawInput = minRawInput;
     this->maxRawInput = maxRawInput;
     
@@ -28,7 +28,7 @@ Pedal::Pedal(enum pedalType type, uint16_t adsChannel, int16_t minRawInput, int1
     this->startDeadzone = startDeadzone * this->rawRange;
     this->endDeadzone = endDeadzone * this->rawRange;
 
-    this->responsiveInput.begin(adsChannel,true);
+    this->responsiveInput.begin(pinChannel,true);
 
 }
 

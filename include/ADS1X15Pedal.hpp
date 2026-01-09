@@ -15,9 +15,9 @@ public:
 
 
 
-  void adc_init() override;
-  int64_t adc_read() override;
-  void class_init() override;
+  void readerInit() override;
+  int64_t read() override;
+  void oneShotSharedClassInit() override;
 
   // enum ePedal
   // {

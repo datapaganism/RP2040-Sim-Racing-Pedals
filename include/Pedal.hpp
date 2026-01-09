@@ -13,9 +13,9 @@ enum pedalType
 class Pedal
 {
 public:
-    Pedal(enum pedalType type, uint16_t adsChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone);
+    Pedal(enum pedalType type, uint16_t pinChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone);
     
-    static inline bool type_init = false; 
+    static inline bool oneShotSharedClassInitDone = false; 
     enum pedalType type;
 
     int16_t minRawInput = 0;   
@@ -32,10 +32,10 @@ public:
     ResponsiveAnalogRead responsiveInput;
 
     int16_t currentOutput = 0;
-    uint16_t adsChannel = 0;
+    uint16_t pinChannel = 0;
 
-    virtual void class_init();
-    virtual void adc_init();
-    virtual int64_t adc_read();
+    virtual void oneShotSharedClassInit();
+    virtual void readerInit();
+    virtual int64_t read();
   };
 

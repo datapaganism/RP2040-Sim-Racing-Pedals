@@ -13,11 +13,11 @@ public:
 
   using Pedal::Pedal;
 
-  void adc_init() override;
+  void readerInit() override;
 
-  int64_t adc_read() override;
+  int64_t read() override;
 
-  void class_init() override;
+  void oneShotSharedClassInit() override;
 
   // enum ePedal
   // {

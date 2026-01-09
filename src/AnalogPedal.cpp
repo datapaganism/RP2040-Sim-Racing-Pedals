@@ -2,18 +2,18 @@
 
 
 
-void AnalogPedal::adc_init()
+void AnalogPedal::readerInit()
 {
-    pinMode(adsChannel,INPUT);
+    pinMode(pinChannel,INPUT);
 }
 
-int64_t AnalogPedal::adc_read()
+int64_t AnalogPedal::read()
 {
     
-    return analogRead(adsChannel);
+    return analogRead(pinChannel);
 }
 
-void AnalogPedal::class_init()
+void AnalogPedal::oneShotSharedClassInit()
 {
     analogReadResolution(10);
 }

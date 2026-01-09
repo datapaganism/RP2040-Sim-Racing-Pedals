@@ -31,7 +31,7 @@ void Pedals::update()
 {
     for (const auto& pedal : pedals)
     {
-        pedal->currentRawInput = pedal->adc_read();
+        pedal->currentRawInput = pedal->read();
 
         if (pedal->currentRawInput == pedal->lastRawInput)
         {

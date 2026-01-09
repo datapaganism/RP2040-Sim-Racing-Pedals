@@ -9,7 +9,7 @@ ADS1115 ADS(0x48);
 extern TwoWire Wire;
 extern void flash_error();
 
-void ADS1X15Pedal::class_init()
+void ADS1X15Pedal::oneShotSharedClassInit()
 {
     Wire.setSDA(20);
     Wire.setSCL(21);
@@ -34,14 +34,14 @@ void ADS1X15Pedal::class_init()
 
 }
 
-void ADS1X15Pedal::adc_init() 
+void ADS1X15Pedal::readerInit() 
 {
 
 }
 
-int64_t ADS1X15Pedal::adc_read()
+int64_t ADS1X15Pedal::read()
 {
-    int64_t read = ADS.readADC(adsChannel);
+    int64_t read = ADS.readADC(pinChannel);
     if (read == ADS1X15_ERROR_TIMEOUT)
     {
     #ifdef DEBUG

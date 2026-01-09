@@ -12,6 +12,7 @@
 #include "Pedal.hpp"
 #include "AnalogPedal.hpp"
 #include "ADS1X15Pedal.hpp"
+#include "HX711Pedal.hpp"
 
 
 
@@ -76,7 +77,6 @@ void handle_invert_interrupt()
 void setup()
 {
 #ifdef DEBUG
-    while (!Serial) yield();
     Serial.begin(MONITOR_SPEED);
 #endif
 
@@ -86,7 +86,7 @@ void setup()
     // pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::CLUTCH, 2, 21449, 23231, 0.05, 0.05));
     pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::ACCELERATOR, 26, 1023, 620, 0.00, 0.04));
     pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::BRAKE, 28, 1023, 530, 0.00, 0.04));
-    pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::CLUTCH, 27, 1023, 530, 0.05, 0.05));
+    pedal_array.push_back(std::make_unique<HX711Pedal>(pedalType::CLUTCH, 16, 17, 0, 220, 0.05, 0.05));
 
 #ifdef LED
     pixels.begin();
@@ -115,11 +115,11 @@ void setup()
 
     for (const auto& pedal : pedal_array)
     {
-        pedal->class_init();
-        // if (pedal->type_init == false)
+        pedal->oneShotSharedClassInit();
+        // if (pedal->oneShotSharedClassInitDone == false)
         // {
-            pedal->adc_init();
-            // pedal->type_init = true;
+            pedal->readerInit();
+            // pedal->oneShotSharedClassInitDone = true;
         // }
     }
 }
