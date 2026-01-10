@@ -2,8 +2,8 @@
 
 #include <Joystick.h>
 #include <cstdint>
-#include <ADS1X15.h>
 #include <memory>
+#include <vector>
 
 #ifdef LED
 #include <Adafruit_NeoPixel.h>
@@ -20,7 +20,6 @@ public:
     bool inverted = false;
 
     Joystick_ *joystick_ptr;
-    ADS1115 *ads_ptr;
 
     Pedals(std::vector<std::unique_ptr<Pedal>> &pedals);
 
