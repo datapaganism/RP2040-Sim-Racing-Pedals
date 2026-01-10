@@ -18,6 +18,8 @@ public:
   int16_t minOutput = -(1 << 15);
   int16_t maxOutput = (1 << 15) - 1;
 
+  bool useFilter = false;
+
   void readerInit() override;
   int64_t read() override;
   void oneShotSharedClassInit() override;

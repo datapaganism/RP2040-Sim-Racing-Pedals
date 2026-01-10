@@ -22,7 +22,7 @@ void Pedals::update()
     {
         pedal->currentRawInput = pedal->read();
 
-        if (pedal->currentRawInput == pedal->lastRawInput)
+        if ( (!pedal->useFilter) && (pedal->currentRawInput == pedal->lastRawInput))
         {
             continue;
         }
@@ -41,10 +41,11 @@ void Pedals::update()
         }
 #endif
 
-        pedal->responsiveInput.update(pedal->currentRawInput);
-
-        int16_t smoothed = pedal->responsiveInput.getValue();
-        smoothed = pedal->currentRawInput;
+        int16_t smoothed = pedal->currentRawInput;
+        if (pedal->useFilter)
+        {
+            smoothed = (int16_t)pedal->filter->updateEstimate(pedal->currentRawInput);
+        }
 
         int16_t mapMin = (this->inverted) ? pedal->maxOutput : pedal->minOutput;
         int16_t mapMax = (this->inverted) ? pedal->minOutput : pedal->maxOutput;
@@ -55,6 +56,7 @@ void Pedals::update()
             {
                 joystick_ptr->Z(pedal->currentOutput);
             }
+
             if (pedal->type == pedalType::BRAKE)
             {
                 joystick_ptr->Zrotate(pedal->currentOutput);
@@ -125,7 +127,7 @@ void Pedals::debug_print()
             as_string = "Clutch      ";
         }
 
-        Serial.printf("%s- %3i%% Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedal->currentRawInput, pedal->minRawInputRead, pedal->maxRawInputRead, pedal->minRawInput + pedal->startDeadzone, pedal->maxRawInput - pedal->endDeadzone, (pedal->maxRawInputRead - pedal->minRawInputRead));
+        Serial.printf("%s- %3i%% (%5i), Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedal->currentOutput, pedal->currentRawInput, pedal->minRawInputRead, pedal->maxRawInputRead, pedal->minRawInput + pedal->startDeadzone, pedal->maxRawInput - pedal->endDeadzone, (pedal->maxRawInputRead - pedal->minRawInputRead));
     }
 
     Serial.printf("\n");

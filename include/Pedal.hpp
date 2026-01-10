@@ -1,7 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <ResponsiveAnalogRead.h>
+#include <SimpleKalmanFilter.h>
+#include <memory>
+
 
 enum pedalType
 {
@@ -17,6 +19,7 @@ public:
 
   static inline bool oneShotSharedClassInitDone = false;
   enum pedalType type;
+  bool useFilter = true;
 
   int16_t minRawInput = 0;
   int16_t maxRawInput = 0;
@@ -29,7 +32,11 @@ public:
   int16_t currentRawInput = 0;
   int16_t lastRawInput = 0;
   int16_t rawRange = 0;
-  ResponsiveAnalogRead responsiveInput;
+  std::unique_ptr<SimpleKalmanFilter> filter;
+  
+  float filter_e_mea = 1;
+  float filter_e_est = 1;
+  float filter_q = 0.01;
 
   int16_t currentOutput = 0;
   uint16_t pinChannel = 0;
