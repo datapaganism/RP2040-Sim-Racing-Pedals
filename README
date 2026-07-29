@@ -1,10 +1,7 @@
 # Sim Racing Pedals
 
-A Sim Racing Pedals controller using 
-- YD RP2040 (Pi Pico)
-- ADS1115
-
-The ADS1115 is used for two potentiometers and a single loadcell
+A Sim Racing Pedals controller that supports: Onboard ADC, ADS1115, HX711
+Supports YD RP2040 (Pi Pico)
 
 Build with platformio
 
@@ -18,13 +15,13 @@ Clutch      -   0 %, Raw:  4578, Min:  4562, Max: 4580, Range:   18
 Press the Pedals in full once and Min and Max are the values set in `main.cpp`
 
 ```cpp
-// Define Pedal values in this array, comment out a Pedal if not needed.
-Pedal pedal_array[] = { 
-  Pedal(ePedal::ACCELERATOR,  6249, 8696 , 0.0, 0.0 ),
-  Pedal(ePedal::BRAKE, 2653, 2615, 0.0, 0.0 ),
-  Pedal(ePedal::CLUTCH, 4578, 4562, 0.05, 0.05 )
-};
+  pedal_array.push_back(std::make_unique<ADS1X15>     (pedalType::ACCELERATOR,  0, 1023, 620, 0.00, 0.04));
+  pedal_array.push_back(std::make_unique<HX711Pedal>  (pedalType::BRAKE,        16, 17, 0, 220, 0.05, 0.05));
+  pedal_array.push_back(std::make_unique<AnalogPedal> (pedalType::CLUTCH,       28, 1023, 530, 0.00, 0.04));
 ```
+Define your pedals by `push_back`ing onto `pedal_array` in `setup()`
+The constructors are similar, you define the `pedalType::`, pin/ADS channel (or data, clock pins of HX711), Start Raw Value, End Raw Value, Start Deadzone, End Deadzone
+
 
 when LED is set
 

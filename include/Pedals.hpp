@@ -2,28 +2,28 @@
 
 #include <Joystick.h>
 #include <cstdint>
-#include <ADS1X15.h>
+#include <memory>
+#include <vector>
 
 #ifdef LED
 #include <Adafruit_NeoPixel.h>
 #endif
 
 #include "Pedal.hpp"
+#include "AnalogPedal.hpp"
 
 class Pedals
 {
 public:
-    int number_of_pedals;
-    Pedal* pedals;
-    bool updated = false;
+    std::vector<std::unique_ptr<Pedal>> &pedals;
+    bool updated = true;
     bool inverted = false;
 
-    Joystick_* joystick_ptr;
-    ADS1115* ads_ptr;
+    Joystick_ *joystick_ptr;
 
-    Pedals(int number_of_pedals, Pedal* pedal_array);
+    Pedals(std::vector<std::unique_ptr<Pedal>> &pedals);
 
-    int begin(Joystick_* joystickPtr, ADS1115* adsPtr);
+    int begin(Joystick_ *joystickPtr);
     void update();
     void invert();
 
@@ -31,7 +31,7 @@ public:
     void debug_print();
 #endif
 
-    #ifdef LED
+#ifdef LED
     uint32_t get_led_colour();
-    #endif
+#endif
 };

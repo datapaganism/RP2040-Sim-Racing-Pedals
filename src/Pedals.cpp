@@ -1,27 +1,10 @@
 #include <Pedals.hpp>
 #include <Pedal.hpp>
 
-// extern Joystick_ Joystick;
+Pedals::Pedals(std::vector<std::unique_ptr<Pedal>> &pedals) : pedals(pedals) {}
 
-Pedals::Pedals(int number_of_pedals, Pedal *pedal_array)
+int Pedals::begin(Joystick_ *joystickPtr)
 {
-    this->number_of_pedals = number_of_pedals;
-    this->pedals = pedal_array;
-}
-
-int Pedals::begin(Joystick_* joystickPtr, ADS1115* adsPtr)
-{
-    if (adsPtr == NULL)
-    {
-        return 1;
-    }
-
-    if (!adsPtr->isConnected())
-    {
-        return 2;
-    }
-    this->ads_ptr = adsPtr;
-
     if (joystickPtr == NULL)
     {
         return 3;
@@ -33,52 +16,58 @@ int Pedals::begin(Joystick_* joystickPtr, ADS1115* adsPtr)
 
 void Pedals::update()
 {
-    for (int i = 0; i < number_of_pedals; i++)
+    for (const auto &pedal : pedals)
     {
-        pedals[i].currentRawInput = ads_ptr->readADC(pedals[i].adsChannel);
-        if (pedals[i].currentRawInput == pedals[i].lastRawInput)
+        pedal->currentRawInput = pedal->read();
+
+        if ( (!pedal->useFilter) && (pedal->currentRawInput == pedal->lastRawInput))
         {
             continue;
         }
-        pedals[i].lastRawInput = pedals[i].currentRawInput;
+        pedal->lastRawInput = pedal->currentRawInput;
         this->updated = true;
 
+#ifdef DEBUG
+        if (pedal->currentRawInput > pedal->maxRawInputRead)
+        {
+            pedal->maxRawInputRead = pedal->currentRawInput;
+        }
 
-        #ifdef DEBUG
-            if (pedals[i].currentRawInput > pedals[i].maxRawInputRead)
-            {
-                pedals[i].maxRawInputRead = pedals[i].currentRawInput;
-            }
+        if (pedal->currentRawInput < pedal->minRawInputRead)
+        {
+            pedal->minRawInputRead = pedal->currentRawInput;
+        }
+#endif
 
-            if (pedals[i].currentRawInput < pedals[i].minRawInputRead)
-            {
-                pedals[i].minRawInputRead = pedals[i].currentRawInput;
-            }
-        #endif
+        int16_t smoothed = pedal->currentRawInput;
+        if (pedal->useFilter)
+        {
+            smoothed = (int16_t)pedal->filter->updateEstimate(pedal->currentRawInput);
+        }
 
-
-        pedals[i].smoothedInput.add(pedals[i].currentRawInput);
-
-        int16_t smoothed = pedals[i].smoothedInput.get();
-
-        int16_t mapMin = (this->inverted) ? pedals[i].maxOutput : pedals[i].minOutput;
-        int16_t mapMax = (this->inverted) ? pedals[i].minOutput : pedals[i].maxOutput;
-        pedals[i].currentOutput = constrain(map(smoothed, pedals[i].minRawInput + pedals[i].startDeadzone, pedals[i].maxRawInput - pedals[i].endDeadzone, mapMin, mapMax), pedals[i].minOutput, pedals[i].maxOutput );
+        int16_t mapMin = (this->inverted) ? pedal->maxOutput : pedal->minOutput;
+        int16_t mapMax = (this->inverted) ? pedal->minOutput : pedal->maxOutput;
+        pedal->currentOutput = constrain(map(smoothed, pedal->minRawInput + pedal->startDeadzone, pedal->maxRawInput - pedal->endDeadzone, mapMin, mapMax), pedal->minOutput, pedal->maxOutput);
         if (joystick_ptr != NULL)
         {
-            if (pedals[i].adsChannel == ePedal::ACCELERATOR)
+            if (pedal->type == pedalType::ACCELERATOR)
             {
-                joystick_ptr->Z(pedals[i].currentOutput);
+                joystick_ptr->Z(pedal->currentOutput);
             }
 
-            if (pedals[i].adsChannel == ePedal::BRAKE)
-            {  
-            joystick_ptr->Zrotate(pedals[i].currentOutput);
-            }
-            
-            if (pedals[i].adsChannel == ePedal::CLUTCH)
+            if (pedal->type == pedalType::BRAKE)
             {
-                joystick_ptr->slider(pedals[i].currentOutput);
+                joystick_ptr->Zrotate(pedal->currentOutput);
+            }
+
+            if (pedal->type == pedalType::CLUTCH)
+            {
+                joystick_ptr->slider(pedal->currentOutput);
+            }
+
+            if (pedal->type == pedalType::HBRAKE)
+            {
+                joystick_ptr->sliderRight(pedal->currentOutput);
             }
         }
     }
@@ -86,66 +75,76 @@ void Pedals::update()
 #ifdef LED
 uint32_t Pedals::get_led_colour()
 {
-
     uint8_t r = 0;
     uint8_t g = 0;
     uint8_t b = 0;
 
-    for (int i = 0; i < number_of_pedals; i++)
+    for (const auto &pedal : pedals)
     {
 
         uint8_t mapMin = (this->inverted) ? 255 : 0;
         uint8_t mapMax = (this->inverted) ? 0 : 255;
 
-        uint8_t scaled = constrain(map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, mapMin, mapMax ), 0, 255);
+        uint8_t scaled = constrain(map(pedal->currentOutput, pedal->minOutput, pedal->maxOutput, mapMin, mapMax), 0, 255);
 
-        if (pedals[i].adsChannel == ePedal::ACCELERATOR)
+        if (pedal->type == pedalType::ACCELERATOR)
         {
             g = scaled;
         }
 
-        if (pedals[i].adsChannel == ePedal::BRAKE)
+        if (pedal->type == pedalType::BRAKE)
         {
             r = scaled;
         }
 
-        if (pedals[i].adsChannel == ePedal::CLUTCH)
+        if (pedal->type == pedalType::CLUTCH)
+        {
+            b = scaled;
+        }
+
+        if (pedal->type == pedalType::HBRAKE)
         {
             b = scaled;
         }
     }
-    return Adafruit_NeoPixel::Color(r,g,b);
+    return Adafruit_NeoPixel::Color(r, g, b);
 }
 #endif
 
 #ifdef DEBUG
 void Pedals::debug_print()
 {
-    for (int i = 0; i < number_of_pedals; i++)
+    for (const auto &pedal : pedals)
     {
 
-        int percentage = constrain(map(pedals[i].currentOutput, pedals[i].minOutput, pedals[i].maxOutput, 0, 100), 0, 100);
-        
-        const char* as_string;
-        if (pedals[i].adsChannel == ePedal::ACCELERATOR)
+        int percentage = constrain(map(pedal->currentOutput, pedal->minOutput, pedal->maxOutput, 0, 100), 0, 100);
+
+        const char *as_string;
+        if (pedal->type == pedalType::ACCELERATOR)
         {
             as_string = "Accelerator ";
         }
 
-        if (pedals[i].adsChannel == ePedal::BRAKE)
-        {  
+        if (pedal->type == pedalType::BRAKE)
+        {
             as_string = "Brake       ";
         }
-        
-        if (pedals[i].adsChannel == ePedal::CLUTCH)
+
+        if (pedal->type == pedalType::CLUTCH)
         {
             as_string = "Clutch      ";
         }
 
-        Serial.printf("%s- %3i%% Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedals[i].currentRawInput, pedals[i].minRawInputRead, pedals[i].maxRawInputRead,  pedals[i].minRawInput + pedals[i].startDeadzone,  pedals[i].maxRawInput - pedals[i].endDeadzone, (pedals[i].maxRawInputRead - pedals[i].minRawInputRead));
-        
+        if (pedal->type == pedalType::HBRAKE)
+        {
+            as_string = "Handbrake   ";
+        }
+
+
+        int16_t range = (pedal->positiveCoef) ?  (pedal->maxRawInputRead - pedal->minRawInputRead) : (pedal->maxRawInputRead - pedal->minRawInputRead);
+        Serial.printf("%s- %3i%% (%5i), Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedal->currentOutput, pedal->currentRawInput, pedal->minRawInputRead, pedal->maxRawInputRead, pedal->minRawInput + pedal->startDeadzone, pedal->maxRawInput - pedal->endDeadzone, range);
     }
-    
+
     Serial.printf("\n");
 }
 #endif

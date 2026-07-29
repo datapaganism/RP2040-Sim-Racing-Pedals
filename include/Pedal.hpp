@@ -1,40 +1,49 @@
 #pragma once
 
-#include <Joystick.h>
-#include <Smoothed.h>
 #include <cstdint>
-#include <ADS1X15.h>
+#include <SimpleKalmanFilter.h>
+#include <memory>
 
+
+enum pedalType
+{
+  ACCELERATOR,
+  BRAKE,
+  CLUTCH,
+  HBRAKE,
+};
 
 class Pedal
 {
 public:
-    int16_t minRawInput = 0;   
-    int16_t maxRawInput = 0;   
-    int16_t minRawInputRead = (1 << 15) - 1;   
-    int16_t maxRawInputRead = 0;   
-    int16_t minOutput = -(1 << 15);   
-    int16_t maxOutput = (1 << 15) - 1;   
-    int16_t startDeadzone = 0;   
-    int16_t endDeadzone = 0;   
-    int16_t currentRawInput = 0;
-    int16_t lastRawInput = 0;
-    int16_t rawRange = 0;   
-    Smoothed<int16_t> smoothedInput;
+  Pedal(enum pedalType type, uint16_t pinChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone);
 
-    int16_t currentOutput = 0;
-    
-    uint16_t adsChannel = 0;
+  static inline bool oneShotSharedClassInitDone = false;
+  enum pedalType type;
+  bool useFilter = true;
 
+  int16_t minRawInput = 0;
+  int16_t maxRawInput = 0;
+  int16_t minRawInputRead = (1 << 10) - 1;
+  int16_t maxRawInputRead = 0;
+  int16_t minOutput = 0;
+  int16_t maxOutput = (1 << 10) - 1;
+  int16_t startDeadzone = 0;
+  int16_t endDeadzone = 0;
+  int16_t currentRawInput = 0;
+  int16_t lastRawInput = 0;
+  int16_t rawRange = 0;
+  std::unique_ptr<SimpleKalmanFilter> filter;
+  bool positiveCoef = true;
+  
+  float filter_e_mea = 7;
+  float filter_e_est = 7;
+  float filter_q = 0.01;
 
-    Pedal(uint16_t adsChannel, int16_t minRawInput, int16_t maxRawInput, float startDeadzone, float endDeadzone);
+  int16_t currentOutput = 0;
+  uint16_t pinChannel = 0;
 
-};
-
-// Maps ADC Channels to Pedals
-enum ePedal
-{
-  ACCELERATOR = 0,
-  BRAKE = 1,
-  CLUTCH = 2
+  virtual void oneShotSharedClassInit();
+  virtual void readerInit();
+  virtual int64_t read();
 };
