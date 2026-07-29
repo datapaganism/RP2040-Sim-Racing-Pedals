@@ -6,7 +6,7 @@
 class AnalogPedal : public Pedal
 {
 public:
-  int16_t minRawInputRead = (1 << 10) - 1;
+  int16_t minRawInputRead = (1 << 12) - 1;
 
   using Pedal::Pedal;
 

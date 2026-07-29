@@ -13,5 +13,5 @@ int64_t AnalogPedal::read()
 
 void AnalogPedal::oneShotSharedClassInit()
 {
-    analogReadResolution(10);
+    analogReadResolution(12);
 }

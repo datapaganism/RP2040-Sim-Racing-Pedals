@@ -13,11 +13,13 @@ void HX711Pedal::oneShotSharedClassInit()
 void HX711Pedal::readerInit()
 {
     scale.begin(data, clock);
+    scale.set_scale(280);
     scale.tare();
-    scale.set_scale(-10000);
+    this->minRawInput = 0;
+    this->minRawInputRead = 0;
 }
 
 int64_t HX711Pedal::read()
 {
-    return -scale.get_units();
+    return scale.get_units();
 }

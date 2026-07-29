@@ -76,13 +76,14 @@ void setup()
     Serial.begin(MONITOR_SPEED);
 #endif
 
-    // Define Pedal values in this array, comment out a Pedal if not needed.
-    // pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::ACCELERATOR, 0, 10733, 12268, 0.06, 0.02));
-    // pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::BRAKE, 1, 3243, 10000, 0.04, 0.01));
-    // pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::CLUTCH, 2, 21449, 23231, 0.05, 0.05));
-    pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::ACCELERATOR, 26, 1023, 620, 0.00, 0.04));
-    pedal_array.push_back(std::make_unique<AnalogPedal>(pedalType::BRAKE, 28, 1023, 530, 0.00, 0.04));
-    pedal_array.push_back(std::make_unique<HX711Pedal>(pedalType::CLUTCH, 16, 17, 0, 220, 0.05, 0.05));
+// Define Pedal values in this array, comment out a Pedal if not needed.
+#ifdef BUILD_PEDALS
+    pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::ACCELERATOR, 0, 24292, 10691, 0.06, 0.02));
+    pedal_array.push_back(std::make_unique<HX711Pedal>(pedalType::BRAKE, 16, 17, 0, 5000, 0.05, 0.05));
+    pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::CLUTCH, 1, 22245, 10000, 0.05, 0.05));
+#else
+    pedal_array.push_back(std::make_unique<ADS1X15Pedal>(pedalType::HBRAKE, 0, 9700, 10956, 0.06, 0.02));
+#endif
 
 #ifdef LED
     pixels.begin();

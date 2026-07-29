@@ -1,8 +1,6 @@
 #include <Pedals.hpp>
 #include <Pedal.hpp>
 
-// extern Joystick_ Joystick;
-
 Pedals::Pedals(std::vector<std::unique_ptr<Pedal>> &pedals) : pedals(pedals) {}
 
 int Pedals::begin(Joystick_ *joystickPtr)
@@ -66,6 +64,11 @@ void Pedals::update()
             {
                 joystick_ptr->slider(pedal->currentOutput);
             }
+
+            if (pedal->type == pedalType::HBRAKE)
+            {
+                joystick_ptr->sliderRight(pedal->currentOutput);
+            }
         }
     }
 }
@@ -98,6 +101,11 @@ uint32_t Pedals::get_led_colour()
         {
             b = scaled;
         }
+
+        if (pedal->type == pedalType::HBRAKE)
+        {
+            b = scaled;
+        }
     }
     return Adafruit_NeoPixel::Color(r, g, b);
 }
@@ -127,7 +135,14 @@ void Pedals::debug_print()
             as_string = "Clutch      ";
         }
 
-        Serial.printf("%s- %3i%% (%5i), Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedal->currentOutput, pedal->currentRawInput, pedal->minRawInputRead, pedal->maxRawInputRead, pedal->minRawInput + pedal->startDeadzone, pedal->maxRawInput - pedal->endDeadzone, (pedal->maxRawInputRead - pedal->minRawInputRead));
+        if (pedal->type == pedalType::HBRAKE)
+        {
+            as_string = "Handbrake   ";
+        }
+
+
+        int16_t range = (pedal->positiveCoef) ?  (pedal->maxRawInputRead - pedal->minRawInputRead) : (pedal->maxRawInputRead - pedal->minRawInputRead);
+        Serial.printf("%s- %3i%% (%5i), Raw: %5i, Min: %5i, Max: %5i, Min-Dead: %5i, Max-Dead: %5i,  Range: %5i \n", as_string, percentage, pedal->currentOutput, pedal->currentRawInput, pedal->minRawInputRead, pedal->maxRawInputRead, pedal->minRawInput + pedal->startDeadzone, pedal->maxRawInput - pedal->endDeadzone, range);
     }
 
     Serial.printf("\n");

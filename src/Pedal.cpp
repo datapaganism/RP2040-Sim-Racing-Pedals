@@ -29,6 +29,8 @@ Pedal::Pedal(enum pedalType type, uint16_t pinChannel, int16_t minRawInput, int1
     this->startDeadzone = startDeadzone * this->rawRange;
     this->endDeadzone = endDeadzone * this->rawRange;
 
+    this->positiveCoef = (maxRawInput > minRawInput);
+
     if (useFilter)
     {
         filter = std::make_unique<SimpleKalmanFilter>(filter_e_mea,filter_e_est,filter_q);

@@ -9,7 +9,8 @@ enum pedalType
 {
   ACCELERATOR,
   BRAKE,
-  CLUTCH
+  CLUTCH,
+  HBRAKE,
 };
 
 class Pedal
@@ -33,9 +34,10 @@ public:
   int16_t lastRawInput = 0;
   int16_t rawRange = 0;
   std::unique_ptr<SimpleKalmanFilter> filter;
+  bool positiveCoef = true;
   
-  float filter_e_mea = 1;
-  float filter_e_est = 1;
+  float filter_e_mea = 7;
+  float filter_e_est = 7;
   float filter_q = 0.01;
 
   int16_t currentOutput = 0;
