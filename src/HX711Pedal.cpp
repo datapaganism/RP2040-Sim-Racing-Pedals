@@ -19,7 +19,12 @@ void HX711Pedal::readerInit()
     this->minRawInputRead = 0;
 }
 
-int64_t HX711Pedal::read()
+bool HX711Pedal::read(int64_t &value)
 {
-    return scale.get_units();
+    if (scale.is_ready())
+    {
+        value = scale.get_units();
+        return true;
+    }
+    return false;
 }

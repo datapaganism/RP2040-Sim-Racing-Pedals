@@ -6,10 +6,10 @@ void Pedal::readerInit()
     Serial.println("Do not call");
 }
 
-int64_t Pedal::read()
+bool Pedal::read(int64_t &value)
 {
     Serial.println("Do not call");
-    return 0;
+    return false;
 }
 
 void Pedal::oneShotSharedClassInit()

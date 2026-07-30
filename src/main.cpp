@@ -37,11 +37,18 @@ static uint8_t toggle_invert = 0;
 
 const float debug_refresh_rate_hz = DEBUG_HZ;
 const float report_refresh_rate_hz = REPORT_HZ;
+const float capture_refresh_rate_hz = CAPTURE_HZ;
+const float led_refresh_rate_hz = LED_HZ;
+
+
 
 const int debug_refresh_rate_ms = ((1 / debug_refresh_rate_hz) * 1000);
 const int report_refresh_rate_ms = ((1 / report_refresh_rate_hz) * 1000);
+const int capture_refresh_rate_ms = ((1 / capture_refresh_rate_hz) * 1000);
+const int led_refresh_rate_ms = ((1 / led_refresh_rate_hz) * 1000);
 
-unsigned long current_millis = 0, last_debug = 0, last_report = 0;
+
+unsigned long current_millis = 0, last_debug = 0, last_report = 0, last_capture = 0, last_led = 0;
 
 #ifdef LED
 static void flash_error()
@@ -128,14 +135,18 @@ void loop()
 #ifdef DEBUG
     if (current_millis - last_debug > debug_refresh_rate_ms)
     {
+        last_debug = current_millis;
         sendDebug = true;
         clear_serial_monitor();
         pedals.debug_print();
-        last_debug = current_millis;
     }
 #endif
 
-    pedals.update();
+    if (current_millis - last_capture > capture_refresh_rate_ms)
+    {
+        last_capture = current_millis;
+        pedals.update();
+    }
 
     if (current_millis - last_report > report_refresh_rate_ms)
     {
@@ -145,17 +156,21 @@ void loop()
             Joystick.send_now();
             pedals.updated = false;
         }
+    }
 
 #ifdef LED
+    if (current_millis - last_led > led_refresh_rate_ms)
+    {
+        last_led = current_millis;
         pixels.setPixelColor(0, pedals.get_led_colour());
         pixels.show();
+    }
 #endif
 
-        if (toggle_invert != previous_toggle_invert)
-        {
-            digitalWrite(INVERT_BUTTON_LED, toggle_invert);
-            previous_toggle_invert = toggle_invert;
-        }
+    if (toggle_invert != previous_toggle_invert)
+    {
+    digitalWrite(INVERT_BUTTON_LED, toggle_invert);
+        previous_toggle_invert = toggle_invert;
     }
 
 #ifdef DEBUG

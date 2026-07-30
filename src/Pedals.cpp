@@ -18,12 +18,19 @@ void Pedals::update()
 {
     for (const auto &pedal : pedals)
     {
-        pedal->currentRawInput = pedal->read();
+        int64_t value = 0;
+        if (!pedal->read(value))
+        {
+            continue;
+        }
+        pedal->currentRawInput = (int16_t)value;
 
+#ifdef SEND_ON_UPDATE 
         if ( (!pedal->useFilter) && (pedal->currentRawInput == pedal->lastRawInput))
         {
             continue;
         }
+#endif
         pedal->lastRawInput = pedal->currentRawInput;
         this->updated = true;
 

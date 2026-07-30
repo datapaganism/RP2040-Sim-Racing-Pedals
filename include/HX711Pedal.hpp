@@ -21,6 +21,6 @@ public:
   bool useFilter = false;
 
   void readerInit() override;
-  int64_t read() override;
+  bool read(int64_t &value) override;
   void oneShotSharedClassInit() override;
 };

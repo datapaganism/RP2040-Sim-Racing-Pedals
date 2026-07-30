@@ -45,5 +45,6 @@ public:
 
   virtual void oneShotSharedClassInit();
   virtual void readerInit();
-  virtual int64_t read();
+  virtual bool read(int64_t &value);
+
 };

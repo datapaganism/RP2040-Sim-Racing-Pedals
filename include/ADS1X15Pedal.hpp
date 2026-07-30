@@ -13,6 +13,6 @@ public:
   int16_t maxOutput = (1 << 15) - 1;
 
   void readerInit() override;
-  int64_t read() override;
+  bool read(int64_t &value) override;
   void oneShotSharedClassInit() override;
 };

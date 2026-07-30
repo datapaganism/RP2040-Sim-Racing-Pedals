@@ -16,8 +16,7 @@ void ADS1X15Pedal::oneShotSharedClassInit()
 
     ADS.begin();
     ADS.setGain(1);
-    ADS.setMode(1);
-    ADS.setDataRate(7);
+    ADS.setDataRate(ADS1115_860_SPS);
 
     //     if (!ADS.isConnected())
     //     {
@@ -33,17 +32,17 @@ void ADS1X15Pedal::oneShotSharedClassInit()
 
 void ADS1X15Pedal::readerInit()
 {
+
 }
 
-int64_t ADS1X15Pedal::read()
+bool ADS1X15Pedal::read(int64_t &value)
 {
+
     int64_t read = ADS.readADC(pinChannel);
-    if (read == ADS1X15_ERROR_TIMEOUT)
+    if (ADS.getError() != ADS1X15_OK)
     {
-#ifdef DEBUG
-        Serial.printf("timeout\n");
-#endif
-        return 0;
+        return false;
     }
-    return read;
+    value = read;
+    return true;
 }

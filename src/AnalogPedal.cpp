@@ -5,10 +5,10 @@ void AnalogPedal::readerInit()
     pinMode(pinChannel, INPUT);
 }
 
-int64_t AnalogPedal::read()
+bool AnalogPedal::read(int64_t &value)
 {
-
-    return analogRead(pinChannel);
+    value = analogRead(pinChannel);
+    return true;
 }
 
 void AnalogPedal::oneShotSharedClassInit()
